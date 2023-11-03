@@ -3,16 +3,6 @@ const Sequelize = require("../db/database");
 const bcrypt = require("bcryptjs");
 
 const user = Sequelize.define("users", {
-  //   id: {
-  //     type: DataTypes.STRING,
-  //     allowNull: false,
-  //     //defaultValue: Sequelize.UUIDV4, // Default value for new records
-  //     primaryKey: true,
-  //     autoIncrement: true,
-  //     // validate: {
-  //     //   notEmpty: true,
-  //     // },
-  //   },
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -35,6 +25,7 @@ const user = Sequelize.define("users", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: {
       notEmpty: true,
       isEmail: true,
@@ -45,6 +36,17 @@ const user = Sequelize.define("users", {
     allowNull: false,
     validate: {
       notEmpty: true,
+    },
+  },
+  confirmPassword: {
+    type: DataTypes.VIRTUAL, // Virtual field, not stored in the database
+    allowNull: false,
+    validate: {
+      isConfirmPasswordMatch(value) {
+        if (value !== this.password) {
+          throw new Error("Password and confirmPassword do not match");
+        }
+      },
     },
   },
   dateOfBirth: {
@@ -69,16 +71,8 @@ Sequelize.sync()
   });
 
 
-
-  // userSchema.pre("save", async function (next) {
-  //   if (!this.isModified("password")) {
-  //     next();
-  //   }
-  //   const salt = await bcrypt.genSalt(10);
-  //   this.password = await bcrypt.hash(this.password, salt);
-  // });
-// Hook to hash the password before saving
-user.addHook("beforeValidate", async (user, options) => {
+  // Hook to hash the password before saving
+  user.addHook("afterValidate", async (user, options) => {
   if (!user.changed("password")) {
     return;
   }
@@ -89,19 +83,27 @@ user.addHook("beforeValidate", async (user, options) => {
   user.password = hashedPassword;
 });
 
-// user.beforeCreate(async (user, options) => {
-//   const salt = await bcrypt.genSalt(10);
-//   const hashedPassword = await bcrypt.hash(user.password, salt);
-//   user.password = hashedPassword;
-// });
-
 user.prototype.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 
+
 module.exports = user;
 
+
+  // userSchema.pre("save", async function (next) {
+  //   if (!this.isModified("password")) {
+  //     next();
+  //   }
+  //   const salt = await bcrypt.genSalt(10);
+  //   this.password = await bcrypt.hash(this.password, salt);
+  // });
+// user.beforeCreate(async (user, options) => {
+  //   const salt = await bcrypt.genSalt(10);
+//   const hashedPassword = await bcrypt.hash(user.password, salt);
+//   user.password = hashedPassword;
+// });
 // const { Sequelize, DataTypes } = require("sequelize");
 // const sequelize = require("../config/db");
 // //const sequelize = new Sequelize('mysql://lordisrael:loveiman@localhost/person')

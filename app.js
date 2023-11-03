@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const dbConnect = require("./db/database");
 const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 
 
 
@@ -16,6 +17,7 @@ const authRoute = require("./routes/authRoutes.js");
 
 app.use("/api", authRoute);
 app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
 
