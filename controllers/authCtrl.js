@@ -45,7 +45,9 @@ const login = async (req, res) => {
       ],
     });
   } else {
-    res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid credentials" });
+    res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ status: "SUCCESS", message: "Invalid crendentials" });
   }
 
 
