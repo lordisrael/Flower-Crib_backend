@@ -11,7 +11,9 @@ const createPerson = async (req, res) => {
   const userAlreadyExists = await User.findOne({ where: { email } });
   if (!userAlreadyExists) {
     const user = await User.create(req.body);
-    res.status(StatusCodes.CREATED).json({data: [user]});
+    res
+      .status(StatusCodes.CREATED)
+      .json({ status: "SUCCESS", message: "Signup successful", data: [user] });
   } else {
     return res.status(StatusCodes.CONFLICT).json("Email already exists");
   }
