@@ -35,6 +35,8 @@ const login = async (req, res) => {
       });
 
       res.status(StatusCodes.OK).json({
+        status: "SUCCESS",
+        message: "Signin successful",
         id: user.id,
         name: user.name, // Assuming "name" is a field in your User model
         email: user.email,
@@ -43,7 +45,7 @@ const login = async (req, res) => {
     } else {
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json({ error: "Invalid credentials" });
+        .json({ status: "FAILED", message: "Invalid crendentials" });
     }
   } catch (error) {
     console.error("Error:", error);
